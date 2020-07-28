@@ -5,4 +5,4 @@ I made this to work within jupyter notebooks, which is my main tool of visualiza
 
 [Github](https://github.com/MaartenGr/soan/blob/master/soan.ipynb) [nbviewer](http://nbviewer.jupyter.org/github/MaartenGr/soan/blob/master/soan.ipynb)
 
-<img src="https://github.com/MaartenGr/soan/blob/master/reddit.png"/>
+<img src="https://github.com/MaartenGr/soan/blob/master/overview.png"/>
