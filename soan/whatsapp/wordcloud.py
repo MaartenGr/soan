@@ -4,14 +4,14 @@ from PIL                                   import Image
 from wordcloud                             import WordCloud
 from palettable.colorbrewer.qualitative    import Dark2_8
 
-from pattern.nl import sentiment  as sentiment_nl
 
 def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
     """ To create nice looking random colors
     """
     return tuple(Dark2_8.colors[random.randint(0,7)])
 
-def create_wordcloud(data, cmap=None, savefig=False, **kwargs):
+
+def create_wordcloud(data, cmap=None, savefig=False, name=None, **kwargs):
     """ Creates a wordcloud based on a text document
     
     Parameters:
@@ -61,8 +61,9 @@ def create_wordcloud(data, cmap=None, savefig=False, **kwargs):
         wc.recolor(colormap=cmap, random_state=kwargs['random_state'])
         
     if savefig:
-        wc.to_file("output.png")
-    return wc.to_image()
+        wc.to_file(f"results/wordcloud_{name}.png")
+    else:
+        return wc.to_image()
 
 def extract_sentiment_count(counts, user):
     """ Extract and return counts of negative and positive words

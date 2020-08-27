@@ -1,12 +1,14 @@
 import pandas   as pd
 import numpy    as np
 
-from pattern.nl     import parse, split, singularize, predicative, lemma
-
 from sklearn.decomposition              import NMF, LatentDirichletAllocation
 from sklearn.feature_extraction.text    import TfidfVectorizer, CountVectorizer
+import nltk
+from nltk.corpus import stopwords as nltk_stopwords
+nltk.download('stopwords')
 
-def print_top_words(model, feature_names, n_top_words):
+
+def print_top_words(model, feature_names, n_top_words, file=None):
     """ Prints the top words representing the topics created
     by "model". 
     
@@ -23,9 +25,10 @@ def print_top_words(model, feature_names, n_top_words):
         message = "Topic #%d: " % topic_idx
         message += " ".join([feature_names[i]
                              for i in topic.argsort()[:-n_top_words - 1:-1]])
-        print(message)
-    print()
-    
+        print(message, file=file)
+    print(file=file)
+
+
 def prepare_text_nl(row):
     """ Prepares dutch text by doing the following:
     * Lemmatize a word
@@ -44,7 +47,7 @@ def prepare_text_nl(row):
     
     """
     try:
-        message = split(parse(row.Message_Only_Text))
+        message = split(parse(row.Message_Only_Text.encode("utf-8").decode("utf-8")))
     except:
         print(row.Message_Only_Text)
         
@@ -62,8 +65,9 @@ def prepare_text_nl(row):
                 new_message += word + ' '
     
     return new_message
-    
-def topics(df, model = "lda", stopwords = None):
+
+
+def topics(df, model="lda", language=False, save=False):
     """ Either executes LDA or NMF on a dutch document.
     This is a simple implementation and only used for
     "fun" purposes. It is not so much to find the very
@@ -83,26 +87,30 @@ def topics(df, model = "lda", stopwords = None):
         including the extension. 
     
     """
-    # Prepare stopwords
-    if stopwords:
-        with open(stopwords) as stopwords_list:
-            stopwords_list = stopwords_list.readlines()
-            stopwords_list = [word[:-1] for word in stopwords_list]
+    if save:
+        file = open(f"results/topic_{model}.txt", "a")
     else:
-        stopwords_list = []
-        
+        file = None
+
+    # Prepare stopwords
+    try:
+        stopwords = nltk_stopwords.words(language)
+    except:
+        languages = nltk_stopwords.fileids()
+        raise Exception(f"Please select one of the following languages: {languages}")
+
     # Create Topics
     for user in df.User.unique():
-        print("#" * len(user) + "########")
-        print("### " + user + " ###")
-        print("#" * len(user) + "########\n")
+        print("#" * len(user) + "########", file=file)
+        print("### " + user + " ###", file=file)
+        print("#" * len(user) + "########\n", file=file)
 
-        data_samples = df[df.User == user].Message_Prepared
+        data_samples = df[df.User == user].Message_Only_Text
         data_samples = data_samples.tolist()
         
         if model == "lda":
             # Extracting Features
-            tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2,stop_words=stopwords_list)
+            tf_vectorizer = CountVectorizer(max_df=0.95, min_df=2,stop_words=stopwords)
             tf = tf_vectorizer.fit_transform(data_samples)
 
             # Fitting LDA
@@ -114,7 +122,7 @@ def topics(df, model = "lda", stopwords = None):
             feature_names = tf_vectorizer.get_feature_names()
         else:
             # MNF uses tfidf
-            tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, stop_words=stopwords_list)
+            tfidf_vectorizer = TfidfVectorizer(max_df=0.95, min_df=2, stop_words=stopwords)
             tfidf = tfidf_vectorizer.fit_transform(data_samples)
             feature_names = tfidf_vectorizer.get_feature_names()
 
@@ -123,5 +131,5 @@ def topics(df, model = "lda", stopwords = None):
                               init='nndsvd')
             topic_model.fit(tfidf)
         
-        print("\nTopics in {} model:".format(model))
-        print_top_words(topic_model, feature_names, 7)
+        print("\nTopics in {} model:".format(model), file=file)
+        print_top_words(topic_model, feature_names, 7, file=file)

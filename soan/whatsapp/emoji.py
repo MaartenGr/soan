@@ -173,7 +173,8 @@ def prepare_data(df):
     
     return df
 
-def print_stats(unique_emoji, counts):
+
+def print_stats(unique_emoji, counts, save=False):
     """ Prints the top 3 unique and often used emojis
     per user. 
     
@@ -185,32 +186,37 @@ def print_stats(unique_emoji, counts):
         Indicating which emojis are often used by which user
     
     """
+    if save:
+        file = open("results/emoji.txt", "a")
+    else:
+        file = None
     
-    print("#############################")
-    print("### Unique Emoji (TF-IDF) ###")
-    print("#############################")
-    print()
+    print("#############################", file=file)
+    print("### Unique Emoji (TF-IDF) ###", file=file)
+    print("#############################", file=file)
+    print(file=file)
     
     for user in unique_emoji.keys():
-        print(user)
+        print(user, file=file)
         unique_emoji[user] = Counter(unique_emoji[user])
         for emoji, score in unique_emoji[user].most_common(3):
-            print(emoji, score)
-        print()
+            print(emoji, score, file=file)
+        print(file=file)
 
-    print("#########################")
-    print("### Most Common Emoji ###")
-    print("#########################")
-    print()
+    print("#########################", file=file)
+    print("### Most Common Emoji ###", file=file)
+    print("#########################", file=file)
+    print(file=file)
     
     for user in counts.keys():
-        print(user)
+        print(user, file=file)
         counts[user] = Counter(counts[user])
         for emoji, score in counts[user].most_common(3):
-            print(emoji, score)
-        print()
+            print(emoji, score, file=file)
+        print(file=file)
 
-def plot_counts(counts, user):
+
+def plot_counts(counts, user, savefig=False):
     """ Plots the counts of emoji for a single user 
     
     Parameters:
@@ -220,7 +226,6 @@ def plot_counts(counts, user):
     user : str
         Indicates for which user the plot needs to be shown
     """
-    
     # Prepare data
     sorted_x = sorted(counts[user].items(), key=operator.itemgetter(1), reverse=True)
     x = [x[0] for x in sorted_x][:10]
@@ -229,22 +234,38 @@ def plot_counts(counts, user):
     # Plot figure
     fig, ax = plt.subplots()
     fig.set_size_inches(10, 8)
-    ax.bar(x, y,fc='#90C3D4', ec='#90C3D4', linewidth=3, width=.8, zorder=11)
+    bars = ax.bar(x, y,fc='#90C3D4', ec='#90C3D4', linewidth=3, width=.8, zorder=11)
     
     # Remove spines
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
     ax.spines['left'].set_visible(False)
-    ax.yaxis.set_tick_params(labelsize=8)
-    ax.xaxis.set_tick_params(labelsize=18)
+    ax.yaxis.set_tick_params(labelsize=10)
+    ax.xaxis.set_tick_params(labelsize=0)
+    plt.xticks([])
     
     # Set labels
     ax.set_ylabel('Nr Words')
     plt.title("Most often used Emoji")
-    
+    from matplotlib.font_manager import FontProperties
+
+    # Load Apple Color Emoji font
+    for rect1, label in zip(bars, x):
+        height = rect1.get_height()
+        plt.annotate(
+            label,
+            (rect1.get_x() + rect1.get_width() / 2, height + 5),
+            ha="center",
+            va="bottom",
+            fontsize=30
+        )
     # Show figure in a nice format
     plt.tight_layout()
-    plt.show()
+    if savefig:
+        fig.savefig(f'results/emoji_{user}.png', format="PNG", dpi=100)
+    else:
+        plt.show()
+
     
 def plot_corr_matrix(df, user, list_of_words, counts):
     """ Plots a correlation matrix for the most commonly

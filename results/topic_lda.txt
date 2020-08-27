@@ -1,0 +1,24 @@
+###########
+### Her ###
+###########
+
+
+Topics in lda model:
+Topic #0: straks nee hoor niks goed uhm poepie
+Topic #1: ok we schat love eten mag even
+Topic #2: goed ga dankjewel jou lekker morgen weer
+Topic #3: wel oke leuk inderdaad doe fijn denk
+Topic #4: schattie jij thuis even bent fijn hey
+
+##########
+### Me ###
+##########
+
+
+Topics in lda model:
+Topic #0: dank top minuten fiets strakjes bent jij
+Topic #1: we trouwens ojah jij laat halen alleen
+Topic #2: wel goed haha even we leuk super
+Topic #3: lieverd ga thuis boodschappen hey nodig goed
+Topic #4: love you mila we precies afspraak mail
+

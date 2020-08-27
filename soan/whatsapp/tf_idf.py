@@ -1,17 +1,22 @@
 import requests
 
-import pandas    as pd
-import numpy     as np
+import pandas as pd
+import numpy as np
 
-from PIL           import Image
-from collections   import Counter
+from PIL import Image
+from collections import Counter
 
-import matplotlib.pyplot    as plt
-import matplotlib.image     as mpimg
-import matplotlib.patches   as patches
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import matplotlib.patches as patches
 
-from matplotlib.offsetbox      import AnchoredText
-from mpl_toolkits.axes_grid1   import make_axes_locatable
+from matplotlib.offsetbox import AnchoredText
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+import nltk
+from nltk.corpus import stopwords as nltk_stopwords
+nltk.download('stopwords')
+
 
 def count_words_per_user(df, sentence_column = "Message_Only_Text", user_column = "User"):
     """ Creates a count vector for each user in which
@@ -52,7 +57,8 @@ def count_words_per_user(df, sentence_column = "Message_Only_Text", user_column 
             
     return counts
 
-def remove_stopwords(df, file, path='', column = "Word"):
+
+def remove_stopwords(df, language=False, path='', column = "Word"):
     """ Remove stopwords from a dataframe choosing
     a specific column in which to remove those words
     
@@ -60,10 +66,10 @@ def remove_stopwords(df, file, path='', column = "Word"):
     -----------
     df : pandas dataframe
         Dataframe of counts per word per user
-    file : string
-        Name of file that contains the stopwords
     path : string, default ''
         Path of the file that contains the stopwords
+    language : str, default False
+        The language to be used in the built-in nltk stopwords
     column : string, default 'Word'
         Column to clean
 
@@ -74,11 +80,18 @@ def remove_stopwords(df, file, path='', column = "Word"):
         excluding the stopwords
     
     """
-    
-    # Remove stopwords
-    with open(path + file) as stopwords:
-        stopwords = stopwords.readlines()
-        stopwords = [word[:-1] for word in stopwords]
+
+    if language:
+        try:
+            stopwords = nltk_stopwords.words(language)
+        except:
+            languages = nltk_stopwords.fileids()
+            raise Exception(f"Please select one of the following languages: {languages}")
+
+    else:
+        with open(path) as stopwords:
+            stopwords = stopwords.readlines()
+            stopwords = [word[:-1] for word in stopwords]
 
     df = df[~df[column].isin(stopwords)]
     
@@ -229,9 +242,10 @@ def word_uniqueness(row, nr_users, user):
     
     return unique_value_user
 
-def plot_unique_words(df_unique, user, image_path=None, image_url=None, save_name=None, save_path="",
+
+def plot_unique_words(df_unique, user, image_path=None, image_url=None, save=None,
                       title=" ", title_color="white", title_background="black", font=None, 
-                     width=None, height=None):
+                      width=None, height=None):
     """
     
     Parameters:
@@ -246,10 +260,8 @@ def plot_unique_words(df_unique, user, image_path=None, image_url=None, save_nam
         Path to the picture you want to use
     image_url : string 
         Url to the image you want to use
-    save_name : string
+    save : string
         If you want to save the name then simply set a name without extension
-    save_path : string 
-        Where you want to store the image
     title : string
         Title of the plot
     title_color : string
@@ -272,10 +284,10 @@ def plot_unique_words(df_unique, user, image_path=None, image_url=None, save_nam
 
     # Background image to be used, black if nothing selected
     if image_path:
-        img=mpimg.imread(image_path)
+        img = mpimg.imread(image_path)
         img = Image.open(image_path)
     elif image_url:
-        img = Image.open(requests.get(url, stream=True).raw)
+        img = Image.open(requests.get(image_url, stream=True).raw)
     else:
         img = np.zeros([100,100,3],dtype=np.uint8)
         img.fill(0) 
@@ -345,7 +357,7 @@ def plot_unique_words(df_unique, user, image_path=None, image_url=None, save_nam
     # This might be a temporary solution as 
     # makes_axes_locatable might lose its functionality
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("top", size="9%", pad=None)
+    cax = divider.append_axes("top", size="9%", pad=0)
     cax.get_xaxis().set_visible(False)
     cax.get_yaxis().set_visible(False)
     at = AnchoredText(title, loc=10, pad=0,
@@ -359,8 +371,8 @@ def plot_unique_words(df_unique, user, image_path=None, image_url=None, save_nam
     cax.spines['top'].set_visible(False)
                    
     fig.set_size_inches(10, 10)
-    if save_name:
-        plt.savefig(save_path+save_name+'.png', dpi = 300)
+    if save:
+        plt.savefig(f'results/{save}_tfidf.png', dpi = 300)
         
 def print_users(df):
     print("#" * (len('Users')+8))

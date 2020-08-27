@@ -184,4 +184,4 @@ def plot_sentiment(df, colors=None, savefig=False):
     fig.tight_layout()
     
     if savefig:
-        fig.savefig('.png', dpi=300)
+        fig.savefig('results/sentiment.png', dpi=300)

@@ -1,0 +1,24 @@
+###########
+### Her ###
+###########
+
+
+Topics in nmf model:
+Topic #0: ok straks poepie schat voorzichtig geef doe
+Topic #1: oke doe oh schatje straks fijn haal
+Topic #2: schattie fijn thuis gezellig hey bent leuk
+Topic #3: dankjewel lieverd jij slaap lekker morgen poepie
+Topic #4: goed hoor nee jij wel straks ga
+
+##########
+### Me ###
+##########
+
+
+Topics in nmf model:
+Topic #0: ga boodschappen nodig lieverd halen uurtje half
+Topic #1: thuis wel goed haha lekker we morgen
+Topic #2: lieverd dank hey fijn allerliefste plezier verwacht
+Topic #3: gezellig jeey super jeeeey erg hartstikke samen
+Topic #4: love you most more schattie much very
+
