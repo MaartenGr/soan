@@ -8,13 +8,13 @@ Visualization only:
 
 import argparse
 import pandas as pd
-from Soan.whatsapp import helper
-from Soan.whatsapp import general
-from Soan.whatsapp import tf_idf
-from Soan.whatsapp import emoji
-from Soan.whatsapp import topic
-from Soan.whatsapp import sentiment
-from Soan.whatsapp import wordcloud
+from soan.whatsapp import helper
+from soan.whatsapp import general
+from soan.whatsapp import tf_idf
+from soan.whatsapp import emoji
+from soan.whatsapp import topic
+from soan.whatsapp import sentiment
+from soan.whatsapp import wordcloud
 
 
 def parse_arguments() -> argparse.Namespace:
